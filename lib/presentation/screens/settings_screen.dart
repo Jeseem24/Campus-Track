@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/services/notification_service.dart';
+import '../../core/services/backup_service.dart';
 import '../../domain/providers/today_classes_provider.dart';
 
 // Simple boolean provider for persistence
@@ -32,7 +33,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       final granted = await NotificationService().requestPermissions();
       if (granted) {
         setState(() => _notificationsEnabled = true);
-        await NotificationService().showInstantNotification("Notifications Enabled", "You will be reminded 10 mins before classes!");
+        await NotificationService().showInstantNotification("Notifications Enabled", "You will be reminded about your tasks and assignments!");
         // TODO: Schedule here
       } else {
         if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Permission Denied")));
@@ -50,8 +51,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       body: ListView(
         children: [
           SwitchListTile(
-            title: const Text("Class Reminders"),
-            subtitle: const Text("Get notified 10 minutes before each class"),
+            title: const Text("Task & Assignment Reminders"),
+            subtitle: const Text("Get notified about upcoming deadlines"),
             value: _notificationsEnabled,
             onChanged: _toggleNotifications,
           ),
@@ -62,7 +63,68 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onTap: () {
                NotificationService().showInstantNotification("Test", "This is a test notification!");
             },
-          )
+          ),
+          const Divider(),
+          const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Text("Data Management", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+          ),
+          ListTile(
+            leading: const Icon(Icons.save_alt, color: Colors.blue),
+            title: const Text("Backup Data"),
+            subtitle: const Text("Export your data to a file"),
+            onTap: () async {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Generating backup...")),
+              );
+              try {
+                await BackupService().exportData();
+                // Share plugin handles the success UI mostly (by opening share sheet)
+              } catch (e) {
+                if(mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Backup Failed: $e")));
+              }
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.restore, color: Colors.orange),
+            title: const Text("Restore Data"),
+            subtitle: const Text("Import data from a backup file"),
+            onTap: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (c) => AlertDialog(
+                  title: const Text("Restore Data?"),
+                  content: const Text("WARNING: This will DELETE all current data and replace it with the backup. This cannot be undone."),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.pop(c, false), child: const Text("Cancel")),
+                    TextButton(onPressed: () => Navigator.pop(c, true), child: const Text("Proceed", style: TextStyle(color: Colors.red))),
+                  ],
+                ),
+              );
+
+              if (confirm == true) {
+                 if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Restoring data...")));
+                 try {
+                   final success = await BackupService().importData();
+                   if (mounted) {
+                     if (success) {
+                       showDialog(
+                         context: context,
+                         builder: (c) => const AlertDialog(
+                           title: Text("Restore Successful"),
+                           content: Text("Data has been restored. Please restart the app to see all changes."),
+                         ),
+                       );
+                     } else {
+                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Restore Cancelled or Failed")));
+                     }
+                   }
+                 } catch (e) {
+                   if(mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+                 }
+              }
+            },
+          ),
         ],
       ),
     );
