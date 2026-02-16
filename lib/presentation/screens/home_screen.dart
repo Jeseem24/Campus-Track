@@ -30,9 +30,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final tomorrow = today.add(const Duration(days: 1));
     final targetDate = _viewingTomorrow ? tomorrow : today;
 
-    // Fetch Day Info for Header (Day Card)
-    final dayRepo = ref.watch(dayRepositoryProvider);
-    // Note: We use FutureBuilder below for the day card.
+
+
     
     final activeSemester = ref.watch(activeSemesterProvider).valueOrNull;
 
@@ -45,6 +44,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       appBar: AppBar(
         title: const Text('CampusTrack'),
         actions: [
+          // AI Assistant Button - NEW!
+          // AI Assistant Button - DISABLED
+          // IconButton(
+          //   icon: const Icon(Icons.auto_awesome, color: Colors.deepPurpleAccent),
+          //   tooltip: "AI Assistant",
+          //   onPressed: () {
+          //     context.push('/ai-assistant');
+          //   },
+          // ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: "Settings",
+            onPressed: () {
+              context.push('/settings');
+            },
+          ),
+          // Daily Growth Button - DISABLED
+          // IconButton(
+          //   icon: const Icon(Icons.trending_up, color: Colors.green),
+          //   tooltip: "Daily Growth",
+          //   onPressed: () {
+          //     context.push('/daily-practice');
+          //   },
+          // ),
           IconButton(
             icon: const Icon(Icons.book), 
             tooltip: "Subjects",
@@ -92,20 +115,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               const SizedBox(height: 16),
               
-              // Day Card (Dynamic)
-              FutureBuilder(
-                future: dayRepo.getDay(targetDate.millisecondsSinceEpoch), // Fixed method name
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                     return const Center(child: LinearProgressIndicator());
-                  }
-                  if (snapshot.hasError) return Text("Error: ${snapshot.error}");
-                  
-                  final day = snapshot.data;
-                  if (day == null) return const Card(child: Padding(padding: EdgeInsets.all(16), child: Text("Day not generated yet."))); // Startup edge case
-                  
-                  return DayCard(day: day);
-                }
+              // Day Card (Reactive via Riverpod)
+              Consumer(
+                builder: (context, ref, _) {
+                  final dayAsync = ref.watch(academicDayForDateProvider(targetDate.millisecondsSinceEpoch));
+                  return dayAsync.when(
+                    data: (day) {
+                      if (day == null) return const Card(child: Padding(padding: EdgeInsets.all(16), child: Text("Day not generated yet.")));
+                      return DayCard(day: day);
+                    },
+                    loading: () => const Center(child: LinearProgressIndicator()),
+                    error: (e, s) => Text("Error: $e"),
+                  );
+                },
               ),
               
               const SizedBox(height: 16),
