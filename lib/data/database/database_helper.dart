@@ -4,7 +4,7 @@ import 'package:path/path.dart';
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
-  static const int _version = 6;
+  static const int _version = 7;
 
   DatabaseHelper._init();
 
@@ -103,6 +103,7 @@ class DatabaseHelper {
         FOREIGN KEY (subject_id) REFERENCES subjects (id) ON DELETE SET NULL
       )
     ''');
+    
     // 7. Exams Table
     await db.execute('''
       CREATE TABLE exams (
@@ -125,6 +126,12 @@ class DatabaseHelper {
         total_credits REAL NOT NULL
       )
     ''');
+
+    // 9. Create Indices for Performance
+    await db.execute('CREATE INDEX idx_academic_days_semester ON academic_days(semester_id)');
+    await db.execute('CREATE INDEX idx_attendance_date ON attendance(date_epoch)');
+    await db.execute('CREATE INDEX idx_timetable_day_order ON timetable(day_order)');
+    await db.execute('CREATE INDEX idx_subjects_semester ON subjects(semester_id)');
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
@@ -178,7 +185,9 @@ class DatabaseHelper {
           total_credits REAL NOT NULL
         )
       ''');
-      if (oldVersion < 6) {
+    }
+    
+    if (oldVersion < 6) {
       // Version 6: Retry Academic Results creation if failed or for new users on v5
       await db.execute('DROP TABLE IF EXISTS academic_results');
       await db.execute('''
@@ -190,7 +199,14 @@ class DatabaseHelper {
         )
       ''');
     }
-  }
+    
+    if (oldVersion < 7) {
+      // Version 7: Add Performance Indices
+      await db.execute('CREATE INDEX IF NOT EXISTS idx_academic_days_semester ON academic_days(semester_id)');
+      await db.execute('CREATE INDEX IF NOT EXISTS idx_attendance_date ON attendance(date_epoch)');
+      await db.execute('CREATE INDEX IF NOT EXISTS idx_timetable_day_order ON timetable(day_order)');
+      await db.execute('CREATE INDEX IF NOT EXISTS idx_subjects_semester ON subjects(semester_id)');
+    }
   }
 
   // --- CRUD Helpers ---

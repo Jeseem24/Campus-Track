@@ -75,38 +75,57 @@ Future<Map<int, DayAttendanceStatus>> monthlyAttendanceStatus(MonthlyAttendanceS
       continue;
     }
 
+    // Count all statuses properly
     int presentCount = 0;
     int absentCount = 0;
     int odCount = 0;
-
-    // We only care about slots that actually exist in the timetable?
-    // Or we stick to the records? 
-    // Records override timetable.
-    // If a record exists, we count it.
-    // But we also need to account for implicit presents (slots not in records).
+    int cancelledCount = 0;
     
-    // Iterate expected slots
-    for (int i = 1; i <= totalSlots; i++) { // Assuming slots are 1-indexed?
-       // Let's check timetable query. Timetable usually keyed by slot_index. 
-       // We'll assume slot indices match what's in DB.
-       // Actually, we should iterate the known slot indices for this day order, but for simplicity let's rely on counts if simple.
-       // Attendance record keys matching slot indices.
+    // We need to check all expected slots for this day order
+    // Get the actual slots from timetable for this day order
+    final daySlots = timetableRaw
+        .where((r) => r['day_order'] as int == dayOrder)
+        .map((r) => r['slot_index'] as int)
+        .toList();
+    
+    for (var slotIndex in daySlots) {
+      final status = dayRecords[slotIndex];
+      
+      if (status == null) {
+        // No record = default present
+        presentCount++;
+      } else {
+        switch (status) {
+          case 'PRESENT':
+            presentCount++;
+            break;
+          case 'ABSENT':
+            absentCount++;
+            break;
+          case 'OD':
+            odCount++;
+            break;
+          case 'CANCELLED':
+            cancelledCount++;
+            break;
+        }
+      }
     }
     
-    // Precise way:
-    // Count explicit Absent/OD.
-    // Present = Total - (Absent + OD).
-    
-    dayRecords.forEach((slot, status) {
-       if (status == 'ABSENT') absentCount++;
-       if (status == 'OD') odCount++;
-    });
+    // Calculate effective slots (exclude cancelled)
+    final effectiveSlots = daySlots.length - cancelledCount;
+    if (effectiveSlots == 0) {
+      result[dateEpoch] = DayAttendanceStatus.none;
+      continue;
+    }
 
-    if (absentCount == totalSlots) {
+    // Determine status based on counts
+    if (absentCount == effectiveSlots) {
       result[dateEpoch] = DayAttendanceStatus.fullAbsent;
     } else if (absentCount > 0) {
       result[dateEpoch] = DayAttendanceStatus.partial;
     } else {
+      // All are present or OD
       result[dateEpoch] = DayAttendanceStatus.fullPresent;
     }
   }

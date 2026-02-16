@@ -53,9 +53,9 @@ Future<List<CalendarDayState>> monthCalendar(MonthCalendarRef ref, DateTime mont
   final now = DateTime.now();
   final todayMidnight = DateTime(now.year, now.month, now.day);
 
-  // Iterate strictly through the requested month
-  for (int i = 0; i < endOfMonth.day; i++) {
-    final date = startOfMonth.add(Duration(days: i));
+  // Iterate through all days in the requested month
+  for (int dayNum = 1; dayNum <= endOfMonth.day; dayNum++) {
+    final date = DateTime(startOfMonth.year, startOfMonth.month, dayNum);
     final dateEpoch = date.millisecondsSinceEpoch;
 
     // Check if this date is within Semester bounds

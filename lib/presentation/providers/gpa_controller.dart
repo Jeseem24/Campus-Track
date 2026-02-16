@@ -1,9 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/entities/subject.dart';
 import '../../domain/entities/exam.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../domain/entities/subject.dart';
-import '../../domain/entities/exam.dart';
 import '../../domain/providers/all_subjects_provider.dart';
 import '../providers/exam_controller.dart';
 

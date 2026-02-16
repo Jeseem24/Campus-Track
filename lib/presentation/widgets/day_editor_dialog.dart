@@ -6,6 +6,7 @@ import '../../domain/repositories/day_repository.dart';
 import '../../data/repositories/day_repository_impl.dart';
 import '../providers/calendar_provider.dart';
 import '../providers/day_order_provider.dart';
+import '../../domain/providers/today_classes_provider.dart';
 
 class DayEditorDialog extends ConsumerStatefulWidget {
   final DateTime date;
@@ -151,17 +152,20 @@ class _DayEditorDialogState extends ConsumerState<DayEditorDialog> {
     final repo = ref.read(dayRepositoryProvider);
     await repo.saveDay(day);
 
-    // Refresh Providers
+    // Delete all future auto-computed days so they get recalculated
+    // with the new day order sequence from this override
+    await repo.deleteFutureComputedDays(
+      normalized.millisecondsSinceEpoch,
+      widget.semesterId,
+    );
+
+    // Refresh all relevant providers so home screen picks up changes
     ref.invalidate(currentAcademicDayProvider);
-    // There is no easy way to invalidate 'monthCalendarProvider' with specific argument family indiscriminately
-    // But since it watches 'activeSemesterProvider', maybe we can just trigger a refresh or let UI rebuild.
-    // Ideally we should invalidate the specific provider family.
-    // For now, let's hope the UI rebuilds or we force it.
-    // A trick: Invalidate activeSemester (fetch again) might be too heavy?
-    // Proper way: ref.invalidate(monthCalendarProvider);
-    // But it's a family. We need to invalidate the specific month of this date.
-    // Let's rely on the fact that if we pop, the parent might rebuild? No.
-    // We will return 'true' from dialog.
+    // Invalidate all class providers so home screen rebuilds for today AND tomorrow
+    ref.invalidate(todayClassesProvider);
+    ref.invalidate(classesForDateProvider);
+    ref.invalidate(academicDayForDateProvider);
+
     if (mounted) {
       Navigator.pop(context, true);
     }

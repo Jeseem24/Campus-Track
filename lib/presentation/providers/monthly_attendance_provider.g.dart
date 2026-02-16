@@ -7,7 +7,7 @@ part of 'monthly_attendance_provider.dart';
 // **************************************************************************
 
 String _$monthlyAttendanceStatusHash() =>
-    r'3ec88e05c994d5bd1c94a672928c030573fedfc4';
+    r'eed916bcbb49c570c53340c4fd4d9591eecc92f0';
 
 /// Copied from Dart SDK
 class _SystemHash {

@@ -71,11 +71,14 @@ class ClassTimelineWidget extends ConsumerWidget {
                   ),
                   title: Row(
                     children: [
-                      Text(
-                        isFree ? "Free Period" : displaySubject.name,
-                        style: TextStyle(
-                          fontWeight: isFree ? FontWeight.normal : FontWeight.bold,
-                          color: isFree ? Colors.grey : Colors.black87,
+                      Flexible(
+                        child: Text(
+                          isFree ? "Free Period" : displaySubject.name,
+                          style: TextStyle(
+                            fontWeight: isFree ? FontWeight.normal : FontWeight.bold,
+                            color: isFree ? Colors.grey : Colors.black87,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       if (isSwapped) 

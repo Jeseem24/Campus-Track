@@ -6,7 +6,7 @@ part of 'today_classes_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$classesForDateHash() => r'b01edf65b69ff558405dc133dc0ecfa8ef77df87';
+String _$classesForDateHash() => r'4af11a3e76cc418323b37d929cd8bde4a0ca3583';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -166,5 +166,151 @@ final todayClassesProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TodayClassesRef = AutoDisposeFutureProviderRef<List<TimetableSlot>>;
+String _$academicDayForDateHash() =>
+    r'58ae0e60c14bd7783a7ad87237de81d4f9022707';
+
+/// Provider to get the AcademicDay for a given date epoch.
+/// Uses the same lazy generation + DayOrderCalculator logic as classesForDate.
+/// This is used by DayCard on the home screen so it refreshes via Riverpod invalidation.
+///
+/// Copied from [academicDayForDate].
+@ProviderFor(academicDayForDate)
+const academicDayForDateProvider = AcademicDayForDateFamily();
+
+/// Provider to get the AcademicDay for a given date epoch.
+/// Uses the same lazy generation + DayOrderCalculator logic as classesForDate.
+/// This is used by DayCard on the home screen so it refreshes via Riverpod invalidation.
+///
+/// Copied from [academicDayForDate].
+class AcademicDayForDateFamily extends Family<AsyncValue<AcademicDay?>> {
+  /// Provider to get the AcademicDay for a given date epoch.
+  /// Uses the same lazy generation + DayOrderCalculator logic as classesForDate.
+  /// This is used by DayCard on the home screen so it refreshes via Riverpod invalidation.
+  ///
+  /// Copied from [academicDayForDate].
+  const AcademicDayForDateFamily();
+
+  /// Provider to get the AcademicDay for a given date epoch.
+  /// Uses the same lazy generation + DayOrderCalculator logic as classesForDate.
+  /// This is used by DayCard on the home screen so it refreshes via Riverpod invalidation.
+  ///
+  /// Copied from [academicDayForDate].
+  AcademicDayForDateProvider call(int dateEpoch) {
+    return AcademicDayForDateProvider(dateEpoch);
+  }
+
+  @override
+  AcademicDayForDateProvider getProviderOverride(
+    covariant AcademicDayForDateProvider provider,
+  ) {
+    return call(provider.dateEpoch);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'academicDayForDateProvider';
+}
+
+/// Provider to get the AcademicDay for a given date epoch.
+/// Uses the same lazy generation + DayOrderCalculator logic as classesForDate.
+/// This is used by DayCard on the home screen so it refreshes via Riverpod invalidation.
+///
+/// Copied from [academicDayForDate].
+class AcademicDayForDateProvider
+    extends AutoDisposeFutureProvider<AcademicDay?> {
+  /// Provider to get the AcademicDay for a given date epoch.
+  /// Uses the same lazy generation + DayOrderCalculator logic as classesForDate.
+  /// This is used by DayCard on the home screen so it refreshes via Riverpod invalidation.
+  ///
+  /// Copied from [academicDayForDate].
+  AcademicDayForDateProvider(int dateEpoch)
+    : this._internal(
+        (ref) => academicDayForDate(ref as AcademicDayForDateRef, dateEpoch),
+        from: academicDayForDateProvider,
+        name: r'academicDayForDateProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$academicDayForDateHash,
+        dependencies: AcademicDayForDateFamily._dependencies,
+        allTransitiveDependencies:
+            AcademicDayForDateFamily._allTransitiveDependencies,
+        dateEpoch: dateEpoch,
+      );
+
+  AcademicDayForDateProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.dateEpoch,
+  }) : super.internal();
+
+  final int dateEpoch;
+
+  @override
+  Override overrideWith(
+    FutureOr<AcademicDay?> Function(AcademicDayForDateRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: AcademicDayForDateProvider._internal(
+        (ref) => create(ref as AcademicDayForDateRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        dateEpoch: dateEpoch,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<AcademicDay?> createElement() {
+    return _AcademicDayForDateProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is AcademicDayForDateProvider && other.dateEpoch == dateEpoch;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, dateEpoch.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin AcademicDayForDateRef on AutoDisposeFutureProviderRef<AcademicDay?> {
+  /// The parameter `dateEpoch` of this provider.
+  int get dateEpoch;
+}
+
+class _AcademicDayForDateProviderElement
+    extends AutoDisposeFutureProviderElement<AcademicDay?>
+    with AcademicDayForDateRef {
+  _AcademicDayForDateProviderElement(super.provider);
+
+  @override
+  int get dateEpoch => (origin as AcademicDayForDateProvider).dateEpoch;
+}
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -85,9 +85,9 @@ class DayOrderCalculator {
       }
 
       // Move to next day (Add 24 hours in milliseconds)
-      // Note: In production, use strict UTC Date handling to avoid DST issues, 
-      // but for this MVP epoch addition is acceptable if inputs are midnight-aligned.
       iterationEpoch += 86400000; 
+      
+      print('Processing epoch: ${iterationEpoch-86400000}, Existing: ${existingDay != null}, Result: ${resultMap[iterationEpoch-86400000]}, NewTracker: $currentDayOrderTracker');
     }
 
     return resultMap;

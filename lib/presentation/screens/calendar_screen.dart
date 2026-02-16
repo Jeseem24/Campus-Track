@@ -4,10 +4,10 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../domain/entities/academic_day.dart';
+import '../../domain/logic/day_order_calculator.dart'; // Required for proper day calculation
 import '../../data/repositories/day_repository_impl.dart';
 import '../providers/calendar_provider.dart';
 import '../../domain/providers/active_semester_provider.dart';
-import '../widgets/day_editor_dialog.dart';
 import '../widgets/day_editor_dialog.dart';
 import '../widgets/past_attendance_dialog.dart';
 import '../providers/monthly_attendance_provider.dart';
@@ -67,36 +67,34 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     
                     // Auto-Generate if missing
                     if (currentState == null) {
-                       // 1. Check if allowed (within reasonable range, e.g. current semester?)
-                       // For now, allow any date user clicks to be generated for the active semester.
                        final semester = await ref.read(activeSemesterProvider.future);
                        if (semester != null) {
-                          // Check Sunday
-                          final isSunday = dateKey.weekday == DateTime.sunday;
+                          // Get day repository
+                          final dayRepo = ref.read(dayRepositoryProvider);
                           
-                          // Smart Order Inference
-                          int? newOrder;
-                          if (!isSunday) {
-                            // Try yesterday
-                            final yesterday = dateKey.subtract(const Duration(days: 1));
-                            final yesterdayState = dayMap[yesterday];
-                            if (yesterdayState != null && !yesterdayState.isHoliday && yesterdayState.dayOrder != null) {
-                               newOrder = (yesterdayState.dayOrder! % 6) + 1;
-                            } else {
-                               newOrder = 1; // Default
-                            }
-                          }
+                          // Fetch all existing days for proper calculation
+                          final existingDays = await dayRepo.getDaysForSemester(semester.id!);
+                          
+                          // Use DayOrderCalculator for proper sequence computation
+                          final calculator = DayOrderCalculator();
+                          final projection = calculator.calculateProjectedDayOrders(
+                            startDateEpoch: semester.startDate,
+                            endDateEpoch: dateKey.millisecondsSinceEpoch,
+                            existingDays: existingDays,
+                          );
+                          
+                          final calculatedOrder = projection[dateKey.millisecondsSinceEpoch];
+                          final isHoliday = calculatedOrder == null;
                           
                           final newDay = AcademicDay(
                             dateEpoch: dateKey.millisecondsSinceEpoch,
                             semesterId: semester.id!,
-                            dayOrder: isSunday ? null : newOrder,
-                            isHoliday: isSunday,
+                            dayOrder: calculatedOrder,
+                            isHoliday: isHoliday,
                             isManualOverride: false
                           );
                           
                           // Save
-                          final dayRepo = ref.read(dayRepositoryProvider);
                           await dayRepo.saveDay(newDay);
                           
                           // Refresh to show it

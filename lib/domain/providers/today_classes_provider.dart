@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/entities/subject.dart';
 import '../../domain/entities/academic_day.dart'; // New Import
+import '../../domain/logic/day_order_calculator.dart'; // Required for proper day calculation
 import '../../domain/providers/active_semester_provider.dart'; // New Import
 import '../../data/repositories/subject_repository_impl.dart';
 import '../../data/repositories/timetable_repository_impl.dart';
@@ -22,42 +23,35 @@ Future<List<TimetableSlot>> classesForDate(ClassesForDateRef ref, int dateEpoch)
   final dayRepo = ref.watch(dayRepositoryProvider);
   AcademicDay? day = await dayRepo.getDay(dateEpoch); 
   
-  // Lazy Generation Logic
+  // Lazy Generation Logic using proper DayOrderCalculator
   if (day == null) {
       final semester = await ref.watch(activeSemesterProvider.future);
       if (semester != null) {
         final date = DateTime.fromMillisecondsSinceEpoch(dateEpoch);
         
-        // Basic Rules
-        final isSunday = date.weekday == DateTime.sunday;
+        // Fetch all existing days for proper calculation
+        final existingDays = await dayRepo.getDaysForSemester(semester.id!);
         
-        // Try to find previous day to infer order
-        // We can't easily query "PREVIOUS" day without a specific repo method, 
-        // but we can try yesterday.
-        final yesterday = date.subtract(const Duration(days: 1));
-        final prevDay = await dayRepo.getDay(yesterday.millisecondsSinceEpoch);
+        // Use DayOrderCalculator for proper sequence computation
+        final calculator = DayOrderCalculator();
+        final projection = calculator.calculateProjectedDayOrders(
+          startDateEpoch: semester.startDate,
+          endDateEpoch: dateEpoch,
+          existingDays: existingDays,
+        );
         
-        int? newOrder;
-        if (!isSunday) {
-           if (prevDay != null && !prevDay.isHoliday && prevDay.dayOrder != null) {
-             newOrder = (prevDay.dayOrder! % 6) + 1;
-           } else {
-             // Fallback or request manual?
-             // Default to Day Order 1 if we have absolutely no info and it's not Sunday.
-             // Or maybe checking 2 days ago? This is getting complicated for a quick fix.
-             // Simplest Safe Fallback: Day Order 1. User can edit it.
-             newOrder = 1;
-           }
-        }
-
+        final calculatedOrder = projection[dateEpoch];
+        final isHoliday = calculatedOrder == null;
+        
         day = AcademicDay(
           dateEpoch: dateEpoch, 
           semesterId: semester.id!, 
-          dayOrder: isSunday ? null : newOrder,
-          isHoliday: isSunday,
+          dayOrder: calculatedOrder,
+          isHoliday: isHoliday,
           isManualOverride: false
         );
         
+        // Save the computed day to avoid recalculation
         await dayRepo.saveDay(day);
       }
   }
@@ -106,4 +100,40 @@ Future<List<TimetableSlot>> todayClasses(TodayClassesRef ref) async {
   final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
   return ref.watch(classesForDateProvider(today.millisecondsSinceEpoch).future);
+}
+
+/// Provider to get the AcademicDay for a given date epoch.
+/// Uses the same lazy generation + DayOrderCalculator logic as classesForDate.
+/// This is used by DayCard on the home screen so it refreshes via Riverpod invalidation.
+@riverpod
+Future<AcademicDay?> academicDayForDate(AcademicDayForDateRef ref, int dateEpoch) async {
+  final dayRepo = ref.watch(dayRepositoryProvider);
+  AcademicDay? day = await dayRepo.getDay(dateEpoch);
+
+  if (day == null) {
+    final semester = await ref.watch(activeSemesterProvider.future);
+    if (semester != null) {
+      final existingDays = await dayRepo.getDaysForSemester(semester.id!);
+      final calculator = DayOrderCalculator();
+      final projection = calculator.calculateProjectedDayOrders(
+        startDateEpoch: semester.startDate,
+        endDateEpoch: dateEpoch,
+        existingDays: existingDays,
+      );
+
+      final calculatedOrder = projection[dateEpoch];
+      final isHoliday = calculatedOrder == null;
+
+      day = AcademicDay(
+        dateEpoch: dateEpoch,
+        semesterId: semester.id!,
+        dayOrder: calculatedOrder,
+        isHoliday: isHoliday,
+        isManualOverride: false,
+      );
+      await dayRepo.saveDay(day);
+    }
+  }
+
+  return day;
 }
