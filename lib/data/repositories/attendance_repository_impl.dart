@@ -3,6 +3,10 @@ import '../../data/database/database_helper.dart';
 import '../../domain/repositories/attendance_repository.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../../domain/logic/day_order_calculator.dart';
+import '../../domain/entities/academic_day.dart';
+
+
 part 'attendance_repository_impl.g.dart';
 
 @riverpod
@@ -56,19 +60,34 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
     final db = await _db.database;
     final now = DateTime.now();
     // Include full Today (so attendance marks for today count)
-    final endOfToday = DateTime(now.year, now.month, now.day, 23, 59, 59).millisecondsSinceEpoch;
+    final endOfToday = DateTime(now.year, now.month, now.day, 23, 59, 59);
 
-    // 1. Fetch Days
-    // Only count days up to today. Future days should not contribute to "Silence = Present".
-    // If a future day has manual attendance (e.g. pre-approved leave), should we count it?
-    // Generally No. Stats are "As of Today".
-    final days = await db.query(
+    // 0. Fetch Semester Info (Need start date)
+    // We don't have direct access to Semester object here, need to query it.
+    final semesterRaw = await db.query('semesters', where: 'id = ?', whereArgs: [semesterId]);
+    if (semesterRaw.isEmpty) return [];
+    final semesterStartEpoch = semesterRaw.first['start_date'] as int;
+
+    // 1. Fetch Existing Overrides/Days from DB
+    // We need ALL days to correctly project the day order sequence.
+    final allDbDaysRaw = await db.query(
       'academic_days', 
-      where: 'semester_id = ? AND date_epoch <= ? AND is_holiday = 0 AND day_order IS NOT NULL',
-      whereArgs: [semesterId, endOfToday]
+      where: 'semester_id = ?', // Fetch all to be safe for projection
+      whereArgs: [semesterId]
+    );
+    final allDbDays = allDbDaysRaw.map((e) => AcademicDay.fromJson(e)).toList();
+
+    // 2. Calculate Project Days (Start of Semester -> Today)
+    final calculator = DayOrderCalculator();
+    // We must project from start date to today to get accurate day orders
+    // The map is <dateEpoch, dayOrder>
+    final computedDayOrders = calculator.calculateProjectedDayOrders(
+      startDateEpoch: semesterStartEpoch,
+      endDateEpoch: endOfToday.millisecondsSinceEpoch,
+      existingDays: allDbDays,
     );
 
-    // 2. Fetch Timetable
+    // 3. Fetch Timetable
     final timetableRaw = await db.query('timetable');
     // Map<dayOrder, Map<slot, subjectId>>
     final Map<int, Map<int, int>> timetable = {};
@@ -80,7 +99,7 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
       timetable[d]![s] = sub;
     }
 
-    // 3. Fetch Attendance
+    // 4. Fetch Attendance
     final attendanceRaw = await db.query('attendance');
     // Map<dateEpoch, Map<slot, {subjectId, status}>>
     final Map<int, Map<int, Map<String, dynamic>>> attendanceMap = {};
@@ -91,32 +110,50 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
       attendanceMap[d]![s] = row;
     }
 
-    // 4. Initialize Stats Map: SubjectId -> {total, present, absent, od}
+    // 5. Initialize Stats Map: SubjectId -> {total, present, absent, od}
     final Map<int, Map<String, int>> stats = {};
     
-    // Helper
     void ensureSubject(int id) {
       if (!stats.containsKey(id)) {
         stats[id] = {'total': 0, 'present': 0, 'absent': 0, 'od': 0};
       }
     }
 
-    // 5. Iterate Days (The Simulation)
-    for (var dayRow in days) {
-      final dayOrder = dayRow['day_order'] as int;
-      final dateEpoch = dayRow['date_epoch'] as int;
+    // 6. Iterate Computed Days (The True Simulation)
+    // computedDayOrders only contains days with a valid day order (holidays/weekends typically excluded or null)
+    // Actually calculateProjectedDayOrders logic needs checking.
+    // Assuming it returns Map<DateEpoch, int?> where int is dayOrder.
+    // We filter for dates <= endOfToday.
+
+    final sortedDates = computedDayOrders.keys.toList()..sort();
+
+    for (var dateEpoch in sortedDates) {
+      if (dateEpoch > endOfToday.millisecondsSinceEpoch) continue;
       
-      final slots = timetable[dayOrder];
-      if (slots == null) continue;
+      final dayOrder = computedDayOrders[dateEpoch];
+      
+      // Skip if no day order (Weekend/Holiday)
+      if (dayOrder == null) continue; 
+      
+      // Double check if it's explicitly marked as holiday in DB (though calculator should handle this)
+      // The calculator logic usually returns null for holiday.
 
-      for (var entry in slots.entries) {
-        final slotIndex = entry.key;
-        final scheduledSubjectId = entry.value;
+      final slotsMap = timetable[dayOrder] ?? {};
+      final attendanceSlots = attendanceMap[dateEpoch] ?? {};
+      
+      // Union of slots
+      final allSlots = {...slotsMap.keys, ...attendanceSlots.keys}.toList()..sort();
 
+      for (var slotIndex in allSlots) {
+        final scheduledSubjectId = slotsMap[slotIndex];
+        
         // Check for Override/Attendance Entry
-        final override = attendanceMap[dateEpoch]?[slotIndex];
+        final override = attendanceSlots[slotIndex];
 
         if (override == null) {
+          // Standard case: Timetable exists, no override.
+          if (scheduledSubjectId == null) continue;
+
           // SILENCE = PRESENT
           ensureSubject(scheduledSubjectId);
           stats[scheduledSubjectId]!['total'] = stats[scheduledSubjectId]!['total']! + 1;
@@ -126,29 +163,12 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
           final recordedSubjectId = override['subject_id'] as int;
           final status = override['status'] as String;
 
-          if (status == 'CANCELLED') {
-             // If scheduled subject was cancelled, we count nothing.
-             // If swapped subject was cancelled... weird edge case.
-             // Just ignore.
-             continue;
-          }
+          if (status == 'CANCELLED') continue;
 
           ensureSubject(recordedSubjectId);
 
-          // If a swap occurred (Recorded != Scheduled)
-          if (recordedSubjectId != scheduledSubjectId) {
-             // The scheduled subject effectively didn't happen (Cancelled / Free)
-             // So we do NOT increment scheduledSubjectId total.
-             // We DO increment recordedSubjectId total.
-          } else {
-             // Regular class, increment total
-             // ensureSubject called above handles init
-          }
-          
-          // Increment Total for the subject that actually took place
           stats[recordedSubjectId]!['total'] = stats[recordedSubjectId]!['total']! + 1;
 
-          // Increment Status
           switch (status) {
             case 'PRESENT': stats[recordedSubjectId]!['present'] = stats[recordedSubjectId]!['present']! + 1; break;
             case 'ABSENT': stats[recordedSubjectId]!['absent'] = stats[recordedSubjectId]!['absent']! + 1; break;
