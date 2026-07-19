@@ -156,6 +156,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                   _buildLegendItem(context, const Color(0xFFFFDEDE), "Absent"),
                   _buildLegendItem(context, Colors.grey.shade100, "Holiday"),
                   _buildLegendItem(context, const Color(0xFFFFF4D9), "Partial"),
+                  _buildLegendItem(context, const Color(0xFFFFE0B2), "Exams"), // soft orange
+                  _buildLegendItem(context, const Color(0xFFFFF9C4), "Activities"), // soft yellow/amber
                 ],
               ),
             ),
@@ -184,6 +186,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     Color bgColor = Colors.transparent;
     Color textColor = const Color(0xFF2D3436);
     
+    final note = state.note ?? "";
+    final isExam = note.toLowerCase().contains("exam") || note.toLowerCase().contains("cat");
+    final isActivity = note.toLowerCase().contains("activity");
+    
     // Status Logic
     if (isSelected) {
       bgColor = const Color(0xFF2D3436);
@@ -198,8 +204,16 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       bgColor = const Color(0xFFFFF4D9); // Soft Orange
       textColor = const Color(0xFFE17055);
     } else if (isHoliday) {
-      bgColor = Colors.grey.shade100;
-      textColor = Colors.grey.shade500;
+      if (isExam) {
+        bgColor = Colors.orange.shade50;
+        textColor = Colors.orange.shade700;
+      } else if (isActivity) {
+        bgColor = Colors.amber.shade50;
+        textColor = Colors.amber.shade800;
+      } else {
+        bgColor = Colors.grey.shade100;
+        textColor = Colors.grey.shade500;
+      }
     } else if (state.dayOrder != null) {
       // Future working day
       bgColor = Colors.grey.shade50;
@@ -280,6 +294,12 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                   const Text("Status: Holiday 🏖️")
                 else
                   Text("Status: Day Order ${state.dayOrder}"),
+                  
+                if (state.note != null && state.note!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text("Event: ${state.note}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  ),
                   
                 if (state.isManualOverride)
                   const Padding(

@@ -81,7 +81,7 @@ class _DayEditorDialogState extends ConsumerState<DayEditorDialog> {
                   border: OutlineInputBorder(),
                   contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 ),
-                items: [1, 2, 3, 4, 5, 6].map((e) => DropdownMenuItem(value: e, child: Text("Day Order $e"))).toList(),
+                items: [1, 2, 3, 4, 5].map((e) => DropdownMenuItem(value: e, child: Text("Day Order $e"))).toList(),
                 onChanged: (val) {
                   setState(() {
                     _selectedDayOrder = val;

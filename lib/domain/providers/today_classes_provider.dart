@@ -3,6 +3,7 @@ import '../../domain/entities/subject.dart';
 import '../../domain/entities/academic_day.dart'; // New Import
 import '../../domain/logic/day_order_calculator.dart'; // Required for proper day calculation
 import '../../domain/providers/active_semester_provider.dart'; // New Import
+import '../../domain/logic/academic_calendar.dart';
 import '../../data/repositories/subject_repository_impl.dart';
 import '../../data/repositories/timetable_repository_impl.dart';
 import '../../presentation/providers/day_order_provider.dart';
@@ -42,13 +43,15 @@ Future<List<TimetableSlot>> classesForDate(ClassesForDateRef ref, int dateEpoch)
         
         final calculatedOrder = projection[dateEpoch];
         final isHoliday = calculatedOrder == null;
+        final academicEvent = AcademicCalendar.getEvent(date);
         
         day = AcademicDay(
           dateEpoch: dateEpoch, 
           semesterId: semester.id!, 
           dayOrder: calculatedOrder,
           isHoliday: isHoliday,
-          isManualOverride: false
+          isManualOverride: false,
+          note: academicEvent?.note,
         );
         
         // Save the computed day to avoid recalculation
@@ -123,6 +126,7 @@ Future<AcademicDay?> academicDayForDate(AcademicDayForDateRef ref, int dateEpoch
 
       final calculatedOrder = projection[dateEpoch];
       final isHoliday = calculatedOrder == null;
+      final academicEvent = AcademicCalendar.getEvent(DateTime.fromMillisecondsSinceEpoch(dateEpoch));
 
       day = AcademicDay(
         dateEpoch: dateEpoch,
@@ -130,6 +134,7 @@ Future<AcademicDay?> academicDayForDate(AcademicDayForDateRef ref, int dateEpoch
         dayOrder: calculatedOrder,
         isHoliday: isHoliday,
         isManualOverride: false,
+        note: academicEvent?.note,
       );
       await dayRepo.saveDay(day);
     }

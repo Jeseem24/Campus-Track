@@ -3,6 +3,7 @@ import '../../domain/entities/academic_day.dart';
 import '../../domain/logic/day_order_calculator.dart';
 import '../../data/database/database_helper.dart';
 import '../../domain/providers/active_semester_provider.dart';
+import '../../domain/logic/academic_calendar.dart';
 
 part 'calendar_provider.g.dart';
 
@@ -12,6 +13,7 @@ class CalendarDayState {
   final bool isHoliday;
   final bool isManualOverride;
   final bool isToday;
+  final String? note;
 
   CalendarDayState({
     required this.date,
@@ -19,6 +21,7 @@ class CalendarDayState {
     required this.isHoliday,
     this.isManualOverride = false,
     this.isToday = false,
+    this.note,
   });
 }
 
@@ -72,6 +75,7 @@ Future<List<CalendarDayState>> monthCalendar(MonthCalendarRef ref, DateTime mont
 
     final dayOrder = projection[dateEpoch];
     final isHoliday = dayOrder == null;
+    final academicEvent = AcademicCalendar.getEvent(date);
 
     // Check specific record for override flag
     final record = existingDays.cast<AcademicDay?>().firstWhere(
@@ -85,6 +89,7 @@ Future<List<CalendarDayState>> monthCalendar(MonthCalendarRef ref, DateTime mont
       isHoliday: isHoliday,
       isManualOverride: record?.isManualOverride ?? false,
       isToday: date.isAtSameMomentAs(todayMidnight),
+      note: record?.note ?? academicEvent?.note,
     ));
   }
 

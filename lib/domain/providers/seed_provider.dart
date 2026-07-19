@@ -11,5 +11,5 @@ Future<void> seedDatabase(SeedDatabaseRef ref, int semesterId) async {
   final timetableRepo = ref.watch(timetableRepositoryProvider);
   
   final seeder = DataSeeder(subjectRepo, timetableRepo);
-  await seeder.seedSemesterVI(semesterId);
+  await seeder.seedSemesterVII(semesterId);
 }

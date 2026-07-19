@@ -10,7 +10,7 @@ void main() {
       calculator = DayOrderCalculator();
     });
 
-    test('cycles through day orders 1-6 correctly', () {
+    test('cycles through day orders 1-5 correctly', () {
       final start = DateTime(2024, 1, 1).millisecondsSinceEpoch; // Monday
       final end = DateTime(2024, 1, 10).millisecondsSinceEpoch;
       
@@ -31,12 +31,12 @@ void main() {
       expect(result[DateTime(2024, 1, 4).millisecondsSinceEpoch], 4);
       // Fri Jan 5 = Day 5
       expect(result[DateTime(2024, 1, 5).millisecondsSinceEpoch], 5);
-      // Sat Jan 6 = Day 6
-      expect(result[DateTime(2024, 1, 6).millisecondsSinceEpoch], 6);
+      // Sat Jan 6 = Day 1 (cycles back to Day 1)
+      expect(result[DateTime(2024, 1, 6).millisecondsSinceEpoch], 1);
       // Sun Jan 7 = Holiday (null)
       expect(result[DateTime(2024, 1, 7).millisecondsSinceEpoch], null);
-      // Mon Jan 8 = Day 1 (cycles back)
-      expect(result[DateTime(2024, 1, 8).millisecondsSinceEpoch], 1);
+      // Mon Jan 8 = Day 2 (cycles from Day 1)
+      expect(result[DateTime(2024, 1, 8).millisecondsSinceEpoch], 2);
     });
 
     test('marks Sundays as holidays', () {
@@ -82,7 +82,7 @@ void main() {
       // Jan 2 = Day 2
       expect(result[DateTime(2024, 1, 2).millisecondsSinceEpoch], 2);
       // Jan 3 = Holiday (manual override)
-      expect(result[DateTime(202, 1, 3).millisecondsSinceEpoch], null);
+      expect(result[DateTime(2024, 1, 3).millisecondsSinceEpoch], null);
       // Jan 4 = Day 3 (continues from Day 2)
       expect(result[DateTime(2024, 1, 4).millisecondsSinceEpoch], 3);
       // Jan 5 = Day 4
@@ -118,10 +118,10 @@ void main() {
       expect(result[DateTime(2024, 1, 2).millisecondsSinceEpoch], 2);
       // Jan 3 = Day 5 (manual override, no carry)
       expect(result[DateTime(2024, 1, 3).millisecondsSinceEpoch], 5);
-      // Jan 4 = Day 3 (normal sequence resumes)
-      expect(result[DateTime(2024, 1, 4).millisecondsSinceEpoch], 3);
-      // Jan 5 = Day 4
-      expect(result[DateTime(2024, 1, 5).millisecondsSinceEpoch], 4);
+      // Jan 4 = Day 4 (original sequence resumes)
+      expect(result[DateTime(2024, 1, 4).millisecondsSinceEpoch], 4);
+      // Jan 5 = Day 5
+      expect(result[DateTime(2024, 1, 5).millisecondsSinceEpoch], 5);
     });
 
     test('handles gaps in calendar', () {
@@ -159,7 +159,7 @@ void main() {
       expect(result[DateTime(2024, 1, 3).millisecondsSinceEpoch], 3);
       expect(result[DateTime(2024, 1, 4).millisecondsSinceEpoch], 4);
       expect(result[DateTime(2024, 1, 5).millisecondsSinceEpoch], 4); // Manual override
-      expect(result[DateTime(2024, 1, 6).millisecondsSinceEpoch], 5);
+      expect(result[DateTime(2024, 1, 6).millisecondsSinceEpoch], 1); // Background sequence resumes
     });
 
     test('respects semester boundaries', () {
@@ -180,6 +180,33 @@ void main() {
       
       // Days beyond semester can still be calculated (for flexibility)
       expect(result[DateTime(2024, 1, 16).millisecondsSinceEpoch], isNotNull);
+    });
+
+    test('verifies 2026-2027 academic calendar events and sequence logic', () {
+      final start = DateTime(2026, 7, 15).millisecondsSinceEpoch;
+      final end = DateTime(2026, 8, 20).millisecondsSinceEpoch;
+      
+      final result = calculator.calculateProjectedDayOrders(
+        startDateEpoch: start,
+        endDateEpoch: end,
+        existingDays: [],
+        initialDayOrder: 1,
+      );
+
+      // 15 July 2026 = Day 1 (Commencement of classes)
+      expect(result[DateTime(2026, 7, 15).millisecondsSinceEpoch], 1);
+      
+      // 18 July 2026 = Odd Saturday (Third Saturday) = Holiday (null)
+      expect(result[DateTime(2026, 7, 18).millisecondsSinceEpoch], null);
+      
+      // 19 July 2026 = Sunday = Holiday (null)
+      expect(result[DateTime(2026, 7, 19).millisecondsSinceEpoch], null);
+
+      // 25 July 2026 = Non-Professional Cell Activity = Holiday (null)
+      expect(result[DateTime(2026, 7, 25).millisecondsSinceEpoch], null);
+
+      // 13 August 2026 = CAT-I Start = Holiday (null, exam period)
+      expect(result[DateTime(2026, 8, 13).millisecondsSinceEpoch], null);
     });
   });
 }

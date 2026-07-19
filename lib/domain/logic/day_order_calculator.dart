@@ -1,5 +1,6 @@
 import '../entities/academic_day.dart';
 import '../entities/semester.dart';
+import 'academic_calendar.dart';
 
 class DayOrderCalculator {
   /// Calculates the state of academic days from [startDate] to [endDate].
@@ -49,7 +50,7 @@ class DayOrderCalculator {
               // Option A: Carry Forward = YES
               // Future day orders continue from this manual value.
               // So if we forcibly set today to 3, tomorrow should start looking for 4.
-              currentDayOrderTracker = (existingDay.dayOrder! % 6) + 1;
+              currentDayOrderTracker = (existingDay.dayOrder! % 5) + 1;
             } else {
               // Option B: Carry Forward = NO
               // Only this specific day is affected.
@@ -58,29 +59,39 @@ class DayOrderCalculator {
               // This means the tracker should validly increment from its PREVIOUS state
               // as if this day was a normal working day in the background sequence.
               resultMap[iterationEpoch] = existingDay.dayOrder; 
-              currentDayOrderTracker = (currentDayOrderTracker % 6) + 1;
+              currentDayOrderTracker = (currentDayOrderTracker % 5) + 1;
             }
           }
         } else {
           // Day exists in DB but just as a record (maybe with a note), no special property.
           // Treated as a normal computed day.
           resultMap[iterationEpoch] = currentDayOrderTracker;
-          currentDayOrderTracker = (currentDayOrderTracker % 6) + 1;
+          currentDayOrderTracker = (currentDayOrderTracker % 5) + 1;
         }
 
       } else {
         // CASE 2: No Record (Default Behavior)
         final date = DateTime.fromMillisecondsSinceEpoch(iterationEpoch);
-        
-        // Rule: Sundays are HOLIDAYS by default
-        if (date.weekday == DateTime.sunday) {
-          resultMap[iterationEpoch] = null;
-          // Holiday does not advance tracker
+        final academicEvent = AcademicCalendar.getEvent(date);
+
+        if (academicEvent != null) {
+          if (academicEvent.isHoliday) {
+            resultMap[iterationEpoch] = null;
+          } else {
+            resultMap[iterationEpoch] = currentDayOrderTracker;
+            currentDayOrderTracker = (currentDayOrderTracker % 5) + 1;
+          }
         } else {
-          // Rule 6: Assumption Rule - Assumed working day.
-          resultMap[iterationEpoch] = currentDayOrderTracker;
-          // Advance tracker
-          currentDayOrderTracker = (currentDayOrderTracker % 6) + 1;
+          // Rule: Sundays are HOLIDAYS by default
+          if (date.weekday == DateTime.sunday) {
+            resultMap[iterationEpoch] = null;
+            // Holiday does not advance tracker
+          } else {
+            // Rule 6: Assumption Rule - Assumed working day.
+            resultMap[iterationEpoch] = currentDayOrderTracker;
+            // Advance tracker
+            currentDayOrderTracker = (currentDayOrderTracker % 5) + 1;
+          }
         }
       }
 

@@ -23,7 +23,7 @@ class _TimetableEditorScreenState extends ConsumerState<TimetableEditorScreen> w
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 6, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
     _loadTimetable();
   }
 
@@ -32,7 +32,7 @@ class _TimetableEditorScreenState extends ConsumerState<TimetableEditorScreen> w
     final repo = ref.read(timetableRepositoryProvider);
     final newState = <int, Map<int, int>>{};
 
-    for (int i = 1; i <= 6; i++) {
+    for (int i = 1; i <= 5; i++) {
        newState[i] = await repo.getTimetableForDay(i);
     }
 
@@ -82,14 +82,14 @@ class _TimetableEditorScreenState extends ConsumerState<TimetableEditorScreen> w
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
-          tabs: List.generate(6, (i) => Tab(text: "Order ${i + 1}")),
+          tabs: List.generate(5, (i) => Tab(text: "Order ${i + 1}")),
         ),
       ),
       body: _isLoading 
         ? const Center(child: CircularProgressIndicator())
         : TabBarView(
             controller: _tabController,
-            children: List.generate(6, (i) {
+            children: List.generate(5, (i) {
               final dayOrder = i + 1;
               return _buildDayEditor(dayOrder, subjectsAsync);
             }),
