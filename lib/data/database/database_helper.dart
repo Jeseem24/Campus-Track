@@ -1,10 +1,14 @@
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
-  static const int _version = 7;
+  static const int _version = 8;
 
   DatabaseHelper._init();
 
@@ -17,15 +21,61 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDB(String filePath) async {
+    if (kIsWeb) {
+      databaseFactory = databaseFactoryFfiWebNoWebWorker;
+    }
+
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
-    return await openDatabase(
+    final db = await openDatabase(
       path,
       version: _version,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
+
+    // Auto-seed from initial_backup.json if database is newly initialized and empty
+    try {
+      final semesters = await db.query('semesters');
+      if (semesters.isEmpty) {
+        await _seedFromInitialBackup(db);
+      }
+    } catch (e) {
+      debugPrint("Initial seed error: $e");
+    }
+
+    return db;
+  }
+
+  Future<void> _seedFromInitialBackup(Database db) async {
+    try {
+      final jsonString = await rootBundle.loadString('assets/initial_backup.json');
+      final Map<String, dynamic> backup = jsonDecode(jsonString);
+      
+      const tables = [
+        'semesters',
+        'subjects',
+        'academic_days',
+        'timetable',
+        'attendance',
+        'tasks',
+        'exams',
+        'academic_results',
+      ];
+
+      for (final table in tables) {
+        final List? rows = backup[table];
+        if (rows != null) {
+          for (final row in rows) {
+            await db.insert(table, Map<String, dynamic>.from(row), conflictAlgorithm: ConflictAlgorithm.replace);
+          }
+        }
+      }
+      debugPrint("Successfully seeded from initial_backup.json!");
+    } catch (e) {
+      debugPrint("Could not load initial_backup.json: $e");
+    }
   }
 
   Future<void> _createDB(Database db, int version) async {
@@ -117,6 +167,27 @@ class DatabaseHelper {
       )
     ''');
 
+    // 8. Important Days Table
+    await db.execute('''
+      CREATE TABLE important_days (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        description TEXT,
+        date_epoch INTEGER NOT NULL
+      )
+    ''');
+
+    // 9. Participation Events Table
+    await db.execute('''
+      CREATE TABLE participation_events (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        date_epoch INTEGER NOT NULL,
+        location TEXT,
+        description TEXT
+      )
+    ''');
+
     // 8. Academic Results (CGPA Tracker)
     await db.execute('''
       CREATE TABLE academic_results (
@@ -200,12 +271,25 @@ class DatabaseHelper {
       ''');
     }
     
-    if (oldVersion < 7) {
-      // Version 7: Add Performance Indices
-      await db.execute('CREATE INDEX IF NOT EXISTS idx_academic_days_semester ON academic_days(semester_id)');
-      await db.execute('CREATE INDEX IF NOT EXISTS idx_attendance_date ON attendance(date_epoch)');
-      await db.execute('CREATE INDEX IF NOT EXISTS idx_timetable_day_order ON timetable(day_order)');
-      await db.execute('CREATE INDEX IF NOT EXISTS idx_subjects_semester ON subjects(semester_id)');
+    if (oldVersion < 8) {
+      // Version 8: Add Important Days and Participation Events
+      await db.execute('''
+        CREATE TABLE important_days (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          title TEXT NOT NULL,
+          description TEXT,
+          date_epoch INTEGER NOT NULL
+        )
+      ''');
+      await db.execute('''
+        CREATE TABLE participation_events (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          date_epoch INTEGER NOT NULL,
+          location TEXT,
+          description TEXT
+        )
+      ''');
     }
   }
 

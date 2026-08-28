@@ -12,6 +12,8 @@ import '../widgets/day_editor_dialog.dart';
 import '../widgets/past_attendance_dialog.dart';
 import '../providers/monthly_attendance_provider.dart';
 import '../../core/theme/modern_theme.dart';
+import '../providers/important_day_provider.dart';
+import '../widgets/add_important_day_dialog.dart';
 
 class CalendarScreen extends ConsumerStatefulWidget {
   const CalendarScreen({super.key});
@@ -143,27 +145,77 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               error: (err, stack) => SizedBox(height: 300, child: Center(child: Text("Error: $err"))),
             ),
             
-            const SizedBox(height: 16),
-            // Legend
+            const SizedBox(height: 24),
+            // Important Upcoming Days Section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Wrap(
-                alignment: WrapAlignment.spaceEvenly,
-                spacing: 12,
-                runSpacing: 8,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+<<<<<<< HEAD
                   _buildLegendItem(context, const Color(0xFFE3FCEF), "Present"),
                   _buildLegendItem(context, const Color(0xFFFFDEDE), "Absent"),
                   _buildLegendItem(context, Colors.grey.shade100, "Holiday"),
                   _buildLegendItem(context, const Color(0xFFFFF4D9), "Partial"),
                   _buildLegendItem(context, const Color(0xFFFFE0B2), "Exams"), // soft orange
                   _buildLegendItem(context, const Color(0xFFFFF9C4), "Activities"), // soft yellow/amber
+=======
+                   Text("Upcoming Important Days", style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold)),
+                   const Icon(Icons.star, color: Colors.amber),
+>>>>>>> 1c983b3 (feat: update to 5-day order cycle, add web support with SQLite wasm, and release v5day APK)
                 ],
               ),
             ),
-            const SizedBox(height: 40), // Bottom Buffer
+            const SizedBox(height: 8),
+            Consumer(
+              builder: (context, ref, _) {
+                final upcomingAsync = ref.watch(importantDayListProvider);
+                return upcomingAsync.when(
+                  data: (days) {
+                    if (days.isEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text("No upcoming important days.", style: TextStyle(color: Colors.grey.shade500)),
+                      );
+                    }
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: days.length,
+                      itemBuilder: (context, index) {
+                        final day = days[index];
+                        final date = DateTime.fromMillisecondsSinceEpoch(day.dateEpoch);
+                        return ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: ModernTheme.secondary.withOpacity(0.1),
+                            child: Text("${date.day}", style: TextStyle(color: ModernTheme.secondary, fontWeight: FontWeight.bold)),
+                          ),
+                          title: Text(day.title, style: const TextStyle(fontWeight: FontWeight.w600)),
+                          subtitle: Text("${DateFormat.yMMMd().format(date)}${day.description != null ? ' - ${day.description}' : ''}"),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete_outline, size: 20),
+                            onPressed: () => ref.read(importantDayListProvider.notifier).deleteImportantDay(day.id!),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (e, s) => Text("Error: $e"),
+                );
+              },
+            ),
+            const SizedBox(height: 80), // Bottom Buffer
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => showDialog(
+          context: context,
+          builder: (context) => const AddImportantDayDialog(),
+        ),
+        tooltip: "Add Important Day",
+        child: const Icon(Icons.add_task),
       ),
     );
   }

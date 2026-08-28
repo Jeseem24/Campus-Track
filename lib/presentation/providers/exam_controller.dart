@@ -3,6 +3,7 @@ import '../../domain/entities/exam.dart';
 import '../../domain/entities/subject.dart';
 import '../../domain/repositories/exam_repository.dart';
 import '../../data/repositories/exam_repository_impl.dart';
+import '../../core/services/notification_service.dart';
 import '../../domain/providers/active_semester_provider.dart';
 
 part 'exam_controller.g.dart';
@@ -20,7 +21,11 @@ class ExamController extends _$ExamController {
 
   Future<void> addExam(Exam exam) async {
     final repo = ref.read(examRepositoryProvider);
-    await repo.createExam(exam);
+    final id = await repo.createExam(exam);
+    
+    final examWithId = exam.copyWith(id: id);
+    await NotificationService().scheduleExamReminder(examWithId);
+    
     ref.invalidateSelf();
   }
 

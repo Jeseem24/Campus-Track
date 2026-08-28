@@ -3,6 +3,8 @@ import '../entities/semester.dart';
 import 'academic_calendar.dart';
 
 class DayOrderCalculator {
+  static const int maxDayOrder = 5;
+
   /// Calculates the state of academic days from [startDate] to [endDate].
   /// 
   /// [existingDays] contains known exceptions (holidays, manual overrides).
@@ -50,23 +52,25 @@ class DayOrderCalculator {
               // Option A: Carry Forward = YES
               // Future day orders continue from this manual value.
               // So if we forcibly set today to 3, tomorrow should start looking for 4.
-              currentDayOrderTracker = (existingDay.dayOrder! % 5) + 1;
+              currentDayOrderTracker = (existingDay.dayOrder! % maxDayOrder) + 1;
             } else {
               // Option B: Carry Forward = NO
               // Only this specific day is affected.
               // Future days follow the ORIGINAL sequence.
               
-              // This means the tracker should validly increment from its PREVIOUS state
-              // as if this day was a normal working day in the background sequence.
               resultMap[iterationEpoch] = existingDay.dayOrder; 
-              currentDayOrderTracker = (currentDayOrderTracker % 5) + 1;
+              
+              // Only increment tracker if the manual override MATCHES what we expected.
+              if (existingDay.dayOrder == currentDayOrderTracker) {
+                currentDayOrderTracker = (currentDayOrderTracker % maxDayOrder) + 1;
+              }
             }
           }
         } else {
           // Day exists in DB but just as a record (maybe with a note), no special property.
           // Treated as a normal computed day.
           resultMap[iterationEpoch] = currentDayOrderTracker;
-          currentDayOrderTracker = (currentDayOrderTracker % 5) + 1;
+          currentDayOrderTracker = (currentDayOrderTracker % maxDayOrder) + 1;
         }
 
       } else {
@@ -79,7 +83,7 @@ class DayOrderCalculator {
             resultMap[iterationEpoch] = null;
           } else {
             resultMap[iterationEpoch] = currentDayOrderTracker;
-            currentDayOrderTracker = (currentDayOrderTracker % 5) + 1;
+            currentDayOrderTracker = (currentDayOrderTracker % maxDayOrder) + 1;
           }
         } else {
           // Rule: Sundays are HOLIDAYS by default
@@ -90,7 +94,7 @@ class DayOrderCalculator {
             // Rule 6: Assumption Rule - Assumed working day.
             resultMap[iterationEpoch] = currentDayOrderTracker;
             // Advance tracker
-            currentDayOrderTracker = (currentDayOrderTracker % 5) + 1;
+            currentDayOrderTracker = (currentDayOrderTracker % maxDayOrder) + 1;
           }
         }
       }

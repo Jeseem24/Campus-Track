@@ -31,11 +31,11 @@ void main() {
       expect(result[DateTime(2024, 1, 4).millisecondsSinceEpoch], 4);
       // Fri Jan 5 = Day 5
       expect(result[DateTime(2024, 1, 5).millisecondsSinceEpoch], 5);
-      // Sat Jan 6 = Day 1 (cycles back to Day 1)
+      // Sat Jan 6 = Day 1 (cycles back to 1)
       expect(result[DateTime(2024, 1, 6).millisecondsSinceEpoch], 1);
       // Sun Jan 7 = Holiday (null)
       expect(result[DateTime(2024, 1, 7).millisecondsSinceEpoch], null);
-      // Mon Jan 8 = Day 2 (cycles from Day 1)
+      // Mon Jan 8 = Day 2 (continues cycle)
       expect(result[DateTime(2024, 1, 8).millisecondsSinceEpoch], 2);
     });
 

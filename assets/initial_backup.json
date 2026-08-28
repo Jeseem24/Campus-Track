@@ -1,0 +1,584 @@
+{
+  "version": 1,
+  "timestamp": "2026-08-28T14:36:18.188626",
+  "semesters": [
+    {
+      "id": 1,
+      "name": "7",
+      "start_date": 1784053800000,
+      "end_date": 1793039400000,
+      "is_active": 1
+    }
+  ],
+  "subjects": [
+    {
+      "id": 1,
+      "name": "Principles of Management",
+      "code": "MS22701",
+      "color": 4290406600,
+      "credits": 3,
+      "semester_id": 1
+    },
+    {
+      "id": 2,
+      "name": "Cryptography and Network Security",
+      "code": "IT22701",
+      "color": 4283283116,
+      "credits": 3,
+      "semester_id": 1
+    },
+    {
+      "id": 3,
+      "name": "Environment and Agriculture (OE2)",
+      "code": "CE22781",
+      "color": 4286695300,
+      "credits": 3,
+      "semester_id": 1
+    },
+    {
+      "id": 4,
+      "name": "Air Pollution and Control Engineering (OE3)",
+      "code": "CE22784",
+      "color": 4283417591,
+      "credits": 3,
+      "semester_id": 1
+    },
+    {
+      "id": 5,
+      "name": "Advanced Web Application Development (PE5)",
+      "code": "IT22711",
+      "color": 4294956367,
+      "credits": 3,
+      "semester_id": 1
+    },
+    {
+      "id": 6,
+      "name": "Digital Marketing (PE6)",
+      "code": "IT22712",
+      "color": 4294937189,
+      "credits": 3,
+      "semester_id": 1
+    },
+    {
+      "id": 7,
+      "name": "Generative AI (PE6)",
+      "code": "IT22722",
+      "color": 4284790262,
+      "credits": 3,
+      "semester_id": 1
+    },
+    {
+      "id": 8,
+      "name": "Security Lab",
+      "code": "IT22702",
+      "color": 4293227379,
+      "credits": 2,
+      "semester_id": 1
+    },
+    {
+      "id": 9,
+      "name": "Mini Project",
+      "code": "IT22703",
+      "color": 4286154443,
+      "credits": 2,
+      "semester_id": 1
+    },
+    {
+      "id": 10,
+      "name": "Coding Skills and Quantitative Aptitude - Phase II",
+      "code": "SD22701",
+      "color": 4288776319,
+      "credits": 2,
+      "semester_id": 1
+    },
+    {
+      "id": 11,
+      "name": "Business Intelligence (Honours)",
+      "code": "IT22731",
+      "color": 4293943954,
+      "credits": 3,
+      "semester_id": 1
+    },
+    {
+      "id": 12,
+      "name": "Social Media Analytics (Honours)",
+      "code": "IT22732",
+      "color": 4292141399,
+      "credits": 3,
+      "semester_id": 1
+    },
+    {
+      "id": 13,
+      "name": "Library",
+      "code": "LIB07",
+      "color": 4287669422,
+      "credits": 0,
+      "semester_id": 1
+    },
+    {
+      "id": 14,
+      "name": "Mentoring",
+      "code": "MENT07",
+      "color": 4291811548,
+      "credits": 0,
+      "semester_id": 1
+    },
+    {
+      "id": 15,
+      "name": "Placement / Communication Skill",
+      "code": "ST07",
+      "color": 4283289825,
+      "credits": 0,
+      "semester_id": 1
+    }
+  ],
+  "academic_days": [
+    {
+      "date_epoch": 1784053800000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 1,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": "Classes Commence"
+    },
+    {
+      "date_epoch": 1784140200000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 2,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": null
+    },
+    {
+      "date_epoch": 1784226600000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 3,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": null
+    },
+    {
+      "date_epoch": 1784399400000,
+      "semester_id": 1,
+      "is_holiday": 1,
+      "day_order": null,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": "Sunday"
+    },
+    {
+      "date_epoch": 1784485800000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 4,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": null
+    },
+    {
+      "date_epoch": 1784831400000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 3,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": null
+    },
+    {
+      "date_epoch": 1784917800000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 4,
+      "is_manual_override": 1,
+      "affects_future": 1,
+      "note": ""
+    },
+    {
+      "date_epoch": 1785004200000,
+      "semester_id": 1,
+      "is_holiday": 1,
+      "day_order": null,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": "Sunday"
+    },
+    {
+      "date_epoch": 1785090600000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 5,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": null
+    },
+    {
+      "date_epoch": 1785177000000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 1,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": null
+    },
+    {
+      "date_epoch": 1785263400000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 2,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": null
+    },
+    {
+      "date_epoch": 1785349800000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 3,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": null
+    },
+    {
+      "date_epoch": 1785436200000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 4,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": null
+    },
+    {
+      "date_epoch": 1785522600000,
+      "semester_id": 1,
+      "is_holiday": 1,
+      "day_order": null,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": "First Saturday"
+    },
+    {
+      "date_epoch": 1785609000000,
+      "semester_id": 1,
+      "is_holiday": 1,
+      "day_order": null,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": "Sunday"
+    },
+    {
+      "date_epoch": 1785695400000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 5,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": null
+    },
+    {
+      "date_epoch": 1785781800000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 1,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": null
+    },
+    {
+      "date_epoch": 1785868200000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 2,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": null
+    },
+    {
+      "date_epoch": 1785954600000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 3,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": null
+    },
+    {
+      "date_epoch": 1786041000000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 4,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": null
+    },
+    {
+      "date_epoch": 1786127400000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 1,
+      "is_manual_override": 1,
+      "affects_future": 1,
+      "note": ""
+    },
+    {
+      "date_epoch": 1786213800000,
+      "semester_id": 1,
+      "is_holiday": 1,
+      "day_order": null,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": "Sunday"
+    },
+    {
+      "date_epoch": 1786300200000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 5,
+      "is_manual_override": 1,
+      "affects_future": 1,
+      "note": ""
+    },
+    {
+      "date_epoch": 1786386600000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 1,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": null
+    },
+    {
+      "date_epoch": 1786473000000,
+      "semester_id": 1,
+      "is_holiday": 1,
+      "day_order": null,
+      "is_manual_override": 1,
+      "affects_future": 1,
+      "note": ""
+    },
+    {
+      "date_epoch": 1786559400000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 2,
+      "is_manual_override": 1,
+      "affects_future": 1,
+      "note": ""
+    },
+    {
+      "date_epoch": 1786645800000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 3,
+      "is_manual_override": 1,
+      "affects_future": 1,
+      "note": ""
+    },
+    {
+      "date_epoch": 1786732200000,
+      "semester_id": 1,
+      "is_holiday": 1,
+      "day_order": null,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": "Independence Day"
+    },
+    {
+      "date_epoch": 1786818600000,
+      "semester_id": 1,
+      "is_holiday": 1,
+      "day_order": null,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": "CAT-I Exam Period"
+    },
+    {
+      "date_epoch": 1786905000000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 4,
+      "is_manual_override": 1,
+      "affects_future": 1,
+      "note": ""
+    },
+    {
+      "date_epoch": 1786991400000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 5,
+      "is_manual_override": 1,
+      "affects_future": 1,
+      "note": ""
+    },
+    {
+      "date_epoch": 1787077800000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 1,
+      "is_manual_override": 1,
+      "affects_future": 1,
+      "note": ""
+    },
+    {
+      "date_epoch": 1787164200000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 2,
+      "is_manual_override": 1,
+      "affects_future": 1,
+      "note": ""
+    },
+    {
+      "date_epoch": 1787250600000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 3,
+      "is_manual_override": 1,
+      "affects_future": 1,
+      "note": ""
+    },
+    {
+      "date_epoch": 1787337000000,
+      "semester_id": 1,
+      "is_holiday": 1,
+      "day_order": null,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": "Non-Professional Cell Activity"
+    },
+    {
+      "date_epoch": 1787423400000,
+      "semester_id": 1,
+      "is_holiday": 1,
+      "day_order": null,
+      "is_manual_override": 0,
+      "affects_future": 0,
+      "note": "CAT-I Exam Period"
+    },
+    {
+      "date_epoch": 1787509800000,
+      "semester_id": 1,
+      "is_holiday": 0,
+      "day_order": 4,
+      "is_manual_override": 1,
+      "affects_future": 1,
+      "note": ""
+    },
+    {
+      "date_epoch": 1787682600000,
+      "semester_id": 1,
+      "is_holiday": 1,
+      "day_order": null,
+      "is_manual_override": 1,
+      "affects_future": 1,
+      "note": ""
+    },
+    {
+      "date_epoch": 1787769000000,
+      "semester_id": 1,
+      "is_holiday": 1,
+      "day_order": null,
+      "is_manual_override": 1,
+      "affects_future": 1,
+      "note": ""
+    },
+    {
+      "date_epoch": 1787855400000,
+      "semester_id": 1,
+      "is_holiday": 1,
+      "day_order": null,
+      "is_manual_override": 1,
+      "affects_future": 1,
+      "note": ""
+    }
+  ],
+  "timetable": [
+    { "day_order": 1, "slot_index": 1, "subject_id": 4 },
+    { "day_order": 1, "slot_index": 2, "subject_id": 2 },
+    { "day_order": 1, "slot_index": 3, "subject_id": 6 },
+    { "day_order": 1, "slot_index": 4, "subject_id": 6 },
+    { "day_order": 1, "slot_index": 5, "subject_id": 10 },
+    { "day_order": 1, "slot_index": 6, "subject_id": 10 },
+    { "day_order": 1, "slot_index": 7, "subject_id": 10 },
+    { "day_order": 1, "slot_index": 8, "subject_id": 10 },
+    { "day_order": 2, "slot_index": 1, "subject_id": 2 },
+    { "day_order": 2, "slot_index": 2, "subject_id": 1 },
+    { "day_order": 2, "slot_index": 3, "subject_id": 5 },
+    { "day_order": 2, "slot_index": 4, "subject_id": 5 },
+    { "day_order": 2, "slot_index": 5, "subject_id": 3 },
+    { "day_order": 2, "slot_index": 6, "subject_id": 13 },
+    { "day_order": 2, "slot_index": 7, "subject_id": 15 },
+    { "day_order": 2, "slot_index": 8, "subject_id": 15 },
+    { "day_order": 3, "slot_index": 1, "subject_id": 3 },
+    { "day_order": 3, "slot_index": 2, "subject_id": 2 },
+    { "day_order": 3, "slot_index": 3, "subject_id": 4 },
+    { "day_order": 3, "slot_index": 4, "subject_id": 3 },
+    { "day_order": 3, "slot_index": 5, "subject_id": 2 },
+    { "day_order": 3, "slot_index": 6, "subject_id": 1 },
+    { "day_order": 3, "slot_index": 7, "subject_id": 14 },
+    { "day_order": 3, "slot_index": 8, "subject_id": 14 },
+    { "day_order": 4, "slot_index": 1, "subject_id": 5 },
+    { "day_order": 4, "slot_index": 2, "subject_id": 4 },
+    { "day_order": 4, "slot_index": 3, "subject_id": 9 },
+    { "day_order": 4, "slot_index": 4, "subject_id": 9 },
+    { "day_order": 4, "slot_index": 5, "subject_id": 8 },
+    { "day_order": 4, "slot_index": 6, "subject_id": 8 },
+    { "day_order": 4, "slot_index": 7, "subject_id": 8 },
+    { "day_order": 4, "slot_index": 8, "subject_id": 8 },
+    { "day_order": 5, "slot_index": 1, "subject_id": 1 },
+    { "day_order": 5, "slot_index": 2, "subject_id": 5 },
+    { "day_order": 5, "slot_index": 3, "subject_id": 6 },
+    { "day_order": 5, "slot_index": 4, "subject_id": 6 },
+    { "day_order": 5, "slot_index": 5, "subject_id": 9 },
+    { "day_order": 5, "slot_index": 6, "subject_id": 9 },
+    { "day_order": 5, "slot_index": 7, "subject_id": 9 },
+    { "day_order": 5, "slot_index": 8, "subject_id": 9 }
+  ],
+  "attendance": [
+    { "date_epoch": 1784053800000, "slot_index": 1, "subject_id": 4, "status": "PRESENT" },
+    { "date_epoch": 1784053800000, "slot_index": 2, "subject_id": 2, "status": "PRESENT" },
+    { "date_epoch": 1784053800000, "slot_index": 3, "subject_id": 6, "status": "PRESENT" },
+    { "date_epoch": 1784053800000, "slot_index": 4, "subject_id": 6, "status": "PRESENT" },
+    { "date_epoch": 1784053800000, "slot_index": 5, "subject_id": 10, "status": "PRESENT" },
+    { "date_epoch": 1784053800000, "slot_index": 6, "subject_id": 10, "status": "PRESENT" },
+    { "date_epoch": 1784053800000, "slot_index": 7, "subject_id": 10, "status": "PRESENT" },
+    { "date_epoch": 1784053800000, "slot_index": 8, "subject_id": 10, "status": "PRESENT" },
+    { "date_epoch": 1784140200000, "slot_index": 1, "subject_id": 2, "status": "PRESENT" },
+    { "date_epoch": 1784140200000, "slot_index": 2, "subject_id": 1, "status": "PRESENT" },
+    { "date_epoch": 1784140200000, "slot_index": 3, "subject_id": 5, "status": "PRESENT" },
+    { "date_epoch": 1784140200000, "slot_index": 4, "subject_id": 5, "status": "PRESENT" },
+    { "date_epoch": 1784140200000, "slot_index": 5, "subject_id": 3, "status": "PRESENT" },
+    { "date_epoch": 1784140200000, "slot_index": 6, "subject_id": 13, "status": "PRESENT" },
+    { "date_epoch": 1784140200000, "slot_index": 7, "subject_id": 15, "status": "PRESENT" },
+    { "date_epoch": 1784140200000, "slot_index": 8, "subject_id": 15, "status": "PRESENT" },
+    { "date_epoch": 1784226600000, "slot_index": 1, "subject_id": 3, "status": "PRESENT" },
+    { "date_epoch": 1784226600000, "slot_index": 2, "subject_id": 2, "status": "PRESENT" },
+    { "date_epoch": 1784226600000, "slot_index": 3, "subject_id": 4, "status": "PRESENT" },
+    { "date_epoch": 1784226600000, "slot_index": 4, "subject_id": 3, "status": "PRESENT" },
+    { "date_epoch": 1784226600000, "slot_index": 5, "subject_id": 2, "status": "PRESENT" },
+    { "date_epoch": 1784226600000, "slot_index": 6, "subject_id": 1, "status": "PRESENT" },
+    { "date_epoch": 1784226600000, "slot_index": 7, "subject_id": 14, "status": "PRESENT" },
+    { "date_epoch": 1784226600000, "slot_index": 8, "subject_id": 14, "status": "PRESENT" },
+    { "date_epoch": 1784831400000, "slot_index": 1, "subject_id": 3, "status": "ABSENT" },
+    { "date_epoch": 1784831400000, "slot_index": 2, "subject_id": 2, "status": "ABSENT" },
+    { "date_epoch": 1784831400000, "slot_index": 3, "subject_id": 4, "status": "ABSENT" },
+    { "date_epoch": 1784831400000, "slot_index": 4, "subject_id": 3, "status": "ABSENT" },
+    { "date_epoch": 1784831400000, "slot_index": 5, "subject_id": 2, "status": "ABSENT" },
+    { "date_epoch": 1784831400000, "slot_index": 6, "subject_id": 1, "status": "ABSENT" },
+    { "date_epoch": 1784831400000, "slot_index": 7, "subject_id": 14, "status": "ABSENT" },
+    { "date_epoch": 1784831400000, "slot_index": 8, "subject_id": 14, "status": "ABSENT" },
+    { "date_epoch": 1785436200000, "slot_index": 1, "subject_id": 5, "status": "ABSENT" },
+    { "date_epoch": 1785436200000, "slot_index": 2, "subject_id": 4, "status": "ABSENT" },
+    { "date_epoch": 1785436200000, "slot_index": 3, "subject_id": 9, "status": "ABSENT" },
+    { "date_epoch": 1785436200000, "slot_index": 4, "subject_id": 9, "status": "ABSENT" },
+    { "date_epoch": 1785436200000, "slot_index": 5, "subject_id": 8, "status": "ABSENT" },
+    { "date_epoch": 1785436200000, "slot_index": 6, "subject_id": 8, "status": "ABSENT" },
+    { "date_epoch": 1785436200000, "slot_index": 7, "subject_id": 8, "status": "ABSENT" },
+    { "date_epoch": 1785436200000, "slot_index": 8, "subject_id": 8, "status": "ABSENT" }
+  ],
+  "tasks": [],
+  "exams": [],
+  "academic_results": []
+}

@@ -6,8 +6,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/theme/app_theme.dart';
 import 'presentation/routes/app_router.dart';
 import 'core/theme/modern_theme.dart';
-
 import 'core/services/notification_service.dart';
+import 'package:flutter/foundation.dart';
 
 // Provider for shared text (for future WhatsApp share feature)
 final sharedTextProvider = StateProvider<String?>((ref) => null);
@@ -22,13 +22,15 @@ void main() async {
     debugPrint("Failed to load .env file: $e");
   }
   
-  // Initialize notification service
-  try {
-    await NotificationService().init();
-    // Schedule persistent reminders
-    await NotificationService().scheduleDailyPracticeReminder();
-  } catch (e) {
-    debugPrint("Notification Service failed to initialize: $e");
+  // Initialize notification service on mobile platforms
+  if (!kIsWeb) {
+    try {
+      await NotificationService().init();
+      // Schedule persistent reminders
+      await NotificationService().scheduleDailyPracticeReminder();
+    } catch (e) {
+      debugPrint("Notification Service failed to initialize: $e");
+    }
   }
 
   runApp(

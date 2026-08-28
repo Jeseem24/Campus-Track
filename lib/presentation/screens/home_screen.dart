@@ -54,6 +54,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           //   },
           // ),
           IconButton(
+            icon: const Icon(Icons.emoji_events, color: Colors.amber),
+            tooltip: "Achievements",
+            onPressed: () {
+              context.push('/achievements');
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.settings),
             tooltip: "Settings",
             onPressed: () {

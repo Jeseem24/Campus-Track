@@ -11,6 +11,7 @@ import '../screens/timetable_editor_screen.dart'; // New Import
 
 
 import '../screens/subjects_screen.dart';
+import '../screens/achievements_screen.dart';
 import '../../domain/providers/active_semester_provider.dart';
 import '../../domain/entities/semester.dart';
 
@@ -59,6 +60,10 @@ GoRouter appRouter(AppRouterRef ref) {
       GoRoute(
         path: '/settings',
         builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: '/achievements',
+        builder: (context, state) => const AchievementsScreen(),
       ),
       // GoRoute(
       //   path: '/ai-assistant',

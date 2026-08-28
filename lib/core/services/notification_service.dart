@@ -265,4 +265,88 @@ class NotificationService {
       matchDateTimeComponents: DateTimeComponents.time,
     );
   }
+
+  /// Schedule persistent daily reminders for a task
+  Future<void> scheduleTaskReminders(Task task) async {
+    if (task.id == null) return;
+
+    // First, cancel any existing notifications for this task to avoid duplicates
+    await cancelTaskReminders(task.id!);
+
+    if (task.isCompleted) return;
+
+    final now = DateTime.now();
+    
+    // Schedule for the next 7 days
+    for (int i = 0; i < 7; i++) {
+      final scheduledDate = _scheduleDaily(9, 0).add(Duration(days: i));
+      
+      String title = '📅 Reminder: ${task.title}';
+      Importance importance = Importance.defaultImportance;
+      Priority priority = Priority.defaultPriority;
+
+      if (i >= 3 && i < 6) {
+        title = '⚠️ Warning: ${task.title} is Overdue!';
+        importance = Importance.high;
+        priority = Priority.high;
+      } else if (i >= 6) {
+        title = '🚨 CRITICAL: Finish ${task.title} Now!';
+        importance = Importance.max;
+        priority = Priority.max;
+      }
+
+      await _notifications.zonedSchedule(
+        task.id! * 1000 + i,
+        title,
+        'Don\'t forget to complete your task: ${task.type == TaskType.assignment ? "[Assignment]" : "[Task]"}',
+        scheduledDate,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            'persistent_tasks',
+            'Task Reminders',
+            channelDescription: 'Daily reminders for pending tasks',
+            importance: importance,
+            priority: priority,
+          ),
+          iOS: const DarwinNotificationDetails(),
+        ),
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        payload: 'task:${task.id}',
+      );
+    }
+  }
+
+  /// Update the 8 PM daily summary based on pending task count
+  Future<void> updateDailySummary(int pendingCount) async {
+    const int summaryId = 888;
+    await _notifications.cancel(summaryId);
+
+    if (pendingCount == 0) return;
+
+    await _notifications.zonedSchedule(
+      summaryId,
+      '🌙 Evening Wrap-Up',
+      'You have $pendingCount tasks still pending. Try to finish them before the day ends! 💪',
+      _scheduleDaily(20, 0), // 8:00 PM
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'daily_wrapup',
+          'Daily Wrap-Up',
+          channelDescription: 'Evening summary of pending tasks',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+        iOS: DarwinNotificationDetails(),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      matchDateTimeComponents: DateTimeComponents.time,
+    );
+  }
+
+  /// Cancel all persistent reminders for a specific task
+  Future<void> cancelTaskReminders(int taskId) async {
+    for (int i = 0; i < 7; i++) {
+      await _notifications.cancel(taskId * 1000 + i);
+    }
+  }
 }
